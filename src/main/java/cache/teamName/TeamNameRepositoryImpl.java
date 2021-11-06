@@ -13,7 +13,9 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static common.Constants.DEVO;
 import static common.Constants.PROD;
@@ -75,6 +77,11 @@ public class TeamNameRepositoryImpl implements TeamNameRepository {
     @Override
     public boolean invalidTeamName(String teamName) {
         return !TEAM_NAMES.contains(teamName);
+    }
+
+    @Override
+    public List<String> getTeamNames() {
+        return TEAM_NAMES.stream().sorted().collect(Collectors.toList());
     }
 
 }

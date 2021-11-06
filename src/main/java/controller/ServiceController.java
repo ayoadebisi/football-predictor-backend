@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,8 @@ import service.exception.ServiceException;
 import service.prediction.PredictionServiceCaller;
 import service.prediction.model.request.PredictionRequest;
 import service.prediction.model.response.PredictionResponse;
+import service.teamData.TeamDataCaller;
+import service.teamData.model.TeamDataResponse;
 
 @Slf4j
 @RestController
@@ -22,6 +25,7 @@ public class ServiceController {
 
     @Autowired TeamNameRepository teamNameRepository;
     @Autowired PredictionServiceCaller predictionServiceCaller;
+    @Autowired TeamDataCaller teamDataCaller;
 
     @PostMapping(value = "/predict", produces = "application/json")
     public ResponseEntity<PredictionResponse> predict(@RequestBody PredictionRequest predictionRequest) throws InvalidServiceRequestException, InternalServiceException {
@@ -34,6 +38,12 @@ public class ServiceController {
         PredictionResponse predictionResponse = predictionServiceCaller.predictMatch(predictionRequest);
 
         return ResponseEntity.ok(predictionResponse);
+    }
+
+    @GetMapping(value = "/teamData", produces = "application/json")
+    public ResponseEntity<TeamDataResponse> getTeamData() {
+        TeamDataResponse teamDataResponse = teamDataCaller.getTeamData();
+        return ResponseEntity.ok(teamDataResponse);
     }
 
     @ExceptionHandler({InvalidServiceRequestException.class})
