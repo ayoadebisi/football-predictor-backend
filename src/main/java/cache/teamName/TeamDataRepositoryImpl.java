@@ -17,12 +17,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
-import static common.Constants.DEVO;
 import static common.Constants.PROD;
 import static common.Constants.STAGE_KEY;
+import static common.RandomNumberGenerator.generateRandomInt;
 
 /**
  * Class is responsible for loading data from Team-Data table, as well
@@ -33,7 +32,6 @@ import static common.Constants.STAGE_KEY;
 public class TeamDataRepositoryImpl implements TeamDataRepository {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Random RAND = new Random();
 
     private static final String TABLE_NAME = "Team-Data";
     private static final String TABLE_ATTRIBUTE_NAME = "Team, Form, CleanSheet, UnbeatenStreak, " +
@@ -58,7 +56,7 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
 
             String stage = env.getProperty(STAGE_KEY);
 
-            if (DEVO.equalsIgnoreCase(stage)) {
+            if (!PROD.equalsIgnoreCase(stage)) {
                 log.info("Retrieving team name for Devo stage.");
                 TEAM_DATA.put("Chelsea", generateMockData("Chelsea"));
                 TEAM_DATA.put("Liverpool", generateMockData("Liverpool"));
@@ -66,7 +64,7 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
                 TEAM_DATA.put("Manchester City", generateMockData("Manchester City"));
                 TEAM_DATA.put("West Ham", generateMockData("West Ham"));
                 TEAM_DATA.put("Arsenal", generateMockData("Arsenal"));
-            } else if (PROD.equalsIgnoreCase(stage)) {
+            } else {
                 log.info("Retrieving team name for Prod stage.");
 
                 Table table = dynamoDB.getTable(TABLE_NAME);
@@ -113,17 +111,13 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
     private TeamData generateMockData(String teamName) {
         return TeamData.builder()
                 .team(teamName)
-                .cleanSheet(generateRandomNumber(UPPER_BOUND_STREAK))
-                .form(generateRandomNumber(UPPER_BOUND_FORM))
-                .unbeatenStreak(generateRandomNumber(UPPER_BOUND_STREAK))
-                .performanceRating(generateRandomNumber(UPPER_BOUND_RATING))
-                .offensiveRating(generateRandomNumber(UPPER_BOUND_RATING))
-                .defensiveRating(generateRandomNumber(UPPER_BOUND_RATING))
+                .cleanSheet(generateRandomInt(UPPER_BOUND_STREAK))
+                .form(generateRandomInt(UPPER_BOUND_FORM))
+                .unbeatenStreak(generateRandomInt(UPPER_BOUND_STREAK))
+                .performanceRating(generateRandomInt(UPPER_BOUND_RATING))
+                .offensiveRating(generateRandomInt(UPPER_BOUND_RATING))
+                .defensiveRating(generateRandomInt(UPPER_BOUND_RATING))
                 .build();
-    }
-
-    private int generateRandomNumber(int max) {
-        return RAND.nextInt(max);
     }
 
 }
