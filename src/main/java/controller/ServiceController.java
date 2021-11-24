@@ -2,7 +2,6 @@ package controller;
 
 import cache.teamName.TeamNameRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,9 +22,15 @@ import service.teamData.model.TeamDataResponse;
 @RestController
 public class ServiceController {
 
-    @Autowired TeamNameRepository teamNameRepository;
-    @Autowired PredictionServiceCaller predictionServiceCaller;
-    @Autowired TeamDataCaller teamDataCaller;
+    final TeamNameRepository teamNameRepository;
+    final PredictionServiceCaller predictionServiceCaller;
+    final TeamDataCaller teamDataCaller;
+
+    public ServiceController(TeamNameRepository teamNameRepository, PredictionServiceCaller predictionServiceCaller, TeamDataCaller teamDataCaller) {
+        this.teamNameRepository = teamNameRepository;
+        this.predictionServiceCaller = predictionServiceCaller;
+        this.teamDataCaller = teamDataCaller;
+    }
 
     @PostMapping(value = "/predict", produces = "application/json")
     public ResponseEntity<PredictionResponse> predict(@RequestBody PredictionRequest predictionRequest) throws InvalidServiceRequestException, InternalServiceException {

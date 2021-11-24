@@ -1,7 +1,6 @@
 package service.prediction;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -18,7 +17,11 @@ public class PredictionServiceCaller {
 
     private static final String ENDPOINT = "/prediction";
 
-    @Autowired WebClient webClient;
+    final WebClient webClient;
+
+    public PredictionServiceCaller(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public PredictionResponse predictMatch(PredictionRequest predictionRequest) throws InternalServiceException {
         return callModelPredictionService(predictionRequest);

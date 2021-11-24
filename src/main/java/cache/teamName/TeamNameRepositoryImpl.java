@@ -7,8 +7,8 @@ import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
@@ -26,14 +26,20 @@ import static common.Constants.STAGE_KEY;
  * as control of accessing team specific data.
  */
 @Slf4j
+@Component
 public class TeamNameRepositoryImpl implements TeamNameRepository {
 
     private static final String TABLE_NAME = "Team-Data";
     private static final String TABLE_ATTRIBUTE_NAME = "Team";
     private static Set<String> TEAM_NAMES = new HashSet();
 
-    @Autowired private DynamoDB dynamoDB;
-    @Autowired private Environment env;
+    private final DynamoDB dynamoDB;
+    private final Environment env;
+
+    public TeamNameRepositoryImpl(DynamoDB dynamoDB, Environment env) {
+        this.dynamoDB = dynamoDB;
+        this.env = env;
+    }
 
     @PostConstruct
     public void init() {

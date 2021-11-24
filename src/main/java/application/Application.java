@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = "aws")
 @ComponentScan(basePackages = "cache")
 @ComponentScan(basePackages = "service")
-@ComponentScan(basePackages = "webClient")
+@ComponentScan(basePackages = "webclient")
 @Slf4j
 public class Application {
 

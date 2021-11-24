@@ -1,6 +1,5 @@
 package webclient.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -22,8 +21,11 @@ public class WebClientConfig {
             Map.of(DEVO, "http://0.0.0.0:5000/v1/ModelDeveloperService",
                     PROD, "https://model-developer-service.herokuapp.com/v1/ModelDeveloperService");
 
-    @Autowired
-    private Environment env;
+    private final Environment env;
+
+    public WebClientConfig(Environment env) {
+        this.env = env;
+    }
 
     @Bean
     public WebClient webClient() {
