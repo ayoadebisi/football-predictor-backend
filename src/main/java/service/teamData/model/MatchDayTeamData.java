@@ -12,20 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TeamDataResponse {
+public class MatchDayTeamData {
 
-    String teamName;
+    TeamDataResponse homeTeam;
 
-    Integer unbeaten;
-
-    Integer cleanSheet;
-
-    Integer form;
-
-    Integer overall;
-
-    Integer offense;
-
-    Integer defense;
+    TeamDataResponse awayTeam;
 
 }

@@ -7,25 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TeamDataResponse {
+public class TeamNameResponse {
 
-    String teamName;
-
-    Integer unbeaten;
-
-    Integer cleanSheet;
-
-    Integer form;
-
-    Integer overall;
-
-    Integer offense;
-
-    Integer defense;
+    List<String> teamNames;
 
 }

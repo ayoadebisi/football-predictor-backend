@@ -1,7 +1,7 @@
 package cache.config;
 
-import cache.teamName.TeamNameRepository;
-import cache.teamName.TeamNameRepositoryImpl;
+import cache.teamName.TeamDataRepository;
+import cache.teamName.TeamDataRepositoryImpl;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +17,8 @@ public class CachingConfig {
     }
 
     @Bean
-    public TeamNameRepository teamNameRepository(DynamoDB dynamoDB) {
-        return new TeamNameRepositoryImpl(dynamoDB, env);
+    public TeamDataRepository teamDataRepository(DynamoDB dynamoDB) {
+        return new TeamDataRepositoryImpl(dynamoDB, env);
     }
 
 }
