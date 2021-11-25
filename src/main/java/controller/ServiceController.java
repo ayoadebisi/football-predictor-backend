@@ -4,6 +4,7 @@ import cache.teamName.TeamDataRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +42,7 @@ public class ServiceController {
         this.teamDataCaller = teamDataCaller;
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(value = "/predict", produces = "application/json")
     public ResponseEntity<PredictionResponse> predict(@RequestBody PredictionRequest predictionRequest)
             throws InvalidServiceRequestException, InternalServiceException {
@@ -52,12 +54,14 @@ public class ServiceController {
         return ResponseEntity.ok(predictionResponse);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "/teamName", produces = "application/json")
     public ResponseEntity<TeamNameResponse> getTeamNames() {
         TeamNameResponse teamNameResponse = teamDataCaller.getTeamNames();
         return ResponseEntity.ok(teamNameResponse);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(value = "/teamData/match", produces = "application/json")
     public ResponseEntity<MatchDayTeamData> getTeamData(@RequestBody PredictionRequest predictionRequest)
             throws InvalidServiceRequestException {
@@ -71,12 +75,14 @@ public class ServiceController {
         return ResponseEntity.ok(matchDayTeamData);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "/teamData/max", produces = "application/json")
     public ResponseEntity<TeamDataMaximum> getTeamDataMaximum() {
         TeamDataMaximum teamDataMaximum = teamDataCaller.getTeamDataMaximum();
         return ResponseEntity.ok(teamDataMaximum);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping(value = "/headToHead", produces = "application/json")
     public ResponseEntity<HeadToHeadDataResponse> getHeadToHeadData(@RequestBody PredictionRequest predictionRequest)
             throws InvalidServiceRequestException {

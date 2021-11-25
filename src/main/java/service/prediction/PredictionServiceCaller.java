@@ -51,8 +51,8 @@ public class PredictionServiceCaller {
         Score score = Score.builder()
                 .home(generateRandomInt(UPPER_BOUND_SCORE))
                 .away(generateRandomInt(UPPER_BOUND_SCORE))
-                .expectedHome(generateRandomFloat(UPPER_BOUND_FORECAST))
-                .expectedAway(generateRandomFloat(UPPER_BOUND_FORECAST))
+                .expectedHome(generateRandomFloat(UPPER_BOUND_EXPECTED_GOALS))
+                .expectedAway(generateRandomFloat(UPPER_BOUND_EXPECTED_GOALS))
                 .build();
         return PredictionResponse.builder()
                 .forecast(predictionForecast)
