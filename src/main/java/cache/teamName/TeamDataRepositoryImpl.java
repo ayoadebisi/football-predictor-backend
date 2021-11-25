@@ -10,6 +10,7 @@ import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import service.teamData.model.TeamDataMaximum;
 
@@ -53,6 +54,7 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
     }
 
     @PostConstruct
+    @Scheduled(cron = "0 0 23 * * MON")
     public void init() {
         try {
             log.info("Loading registered team names from Team-Data table...");
