@@ -4,6 +4,7 @@ import cache.model.TeamData;
 import cache.teamName.TeamDataRepository;
 import org.springframework.stereotype.Component;
 import service.teamData.model.MatchDayTeamData;
+import service.teamData.model.TeamDataMaximum;
 import service.teamData.model.TeamDataResponse;
 import service.teamData.model.TeamNameResponse;
 
@@ -31,6 +32,10 @@ public class TeamDataCaller {
                 .homeTeam(mapTeamDataToResponse(homeTeamData))
                 .awayTeam(mapTeamDataToResponse(awayTeamData))
                 .build();
+    }
+
+    public TeamDataMaximum getTeamDataMaximum() {
+        return teamDataRepository.getTeamDataMaximum();
     }
 
     private TeamDataResponse mapTeamDataToResponse(TeamData teamData) {

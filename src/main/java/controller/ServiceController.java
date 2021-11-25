@@ -17,6 +17,7 @@ import service.prediction.model.request.PredictionRequest;
 import service.prediction.model.response.PredictionResponse;
 import service.teamData.TeamDataCaller;
 import service.teamData.model.MatchDayTeamData;
+import service.teamData.model.TeamDataMaximum;
 import service.teamData.model.TeamNameResponse;
 
 @Slf4j
@@ -59,6 +60,12 @@ public class ServiceController {
         MatchDayTeamData matchDayTeamData = teamDataCaller.getTeamData(homeTeam, awayTeam);
 
         return ResponseEntity.ok(matchDayTeamData);
+    }
+
+    @GetMapping(value = "/teamData/max", produces = "application/json")
+    public ResponseEntity<TeamDataMaximum> getTeamDataMaximum() {
+        TeamDataMaximum teamDataMaximum = teamDataCaller.getTeamDataMaximum();
+        return ResponseEntity.ok(teamDataMaximum);
     }
 
     @ExceptionHandler({InvalidServiceRequestException.class})

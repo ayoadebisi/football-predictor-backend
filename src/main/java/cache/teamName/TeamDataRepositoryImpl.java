@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import service.teamData.model.TeamDataMaximum;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -39,7 +40,9 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
     private static final int UPPER_BOUND_RATING = 100;
     private static final int UPPER_BOUND_STREAK = 60;
     private static final int UPPER_BOUND_FORM = 15;
+
     private static Map<String, TeamData> TEAM_DATA = new HashMap();
+    private static TeamDataMaximum TEAM_DATA_MAX = TeamDataMaximum.builder().build();
 
     private final DynamoDB dynamoDB;
     private final Environment env;
@@ -78,6 +81,7 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
                 while (iter.hasNext()) {
                     Item item = iter.next();
                     TeamData teamData = convertItemToTeamData(item.asMap());
+                    setMaxDataPoints(teamData);
                     TEAM_DATA.put(teamData.getTeam(), teamData);
                 }
             }
@@ -104,12 +108,17 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
         return TEAM_DATA.get(team);
     }
 
+    @Override
+    public TeamDataMaximum getTeamDataMaximum() {
+        return TEAM_DATA_MAX;
+    }
+
     private TeamData convertItemToTeamData(Map<String, Object> item) {
         return MAPPER.convertValue(item, TeamData.class);
     }
 
     private TeamData generateMockData(String teamName) {
-        return TeamData.builder()
+        TeamData teamData = TeamData.builder()
                 .team(teamName)
                 .cleanSheet(generateRandomInt(UPPER_BOUND_STREAK))
                 .form(generateRandomInt(UPPER_BOUND_FORM))
@@ -118,6 +127,22 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
                 .offensiveRating(generateRandomInt(UPPER_BOUND_RATING))
                 .defensiveRating(generateRandomInt(UPPER_BOUND_RATING))
                 .build();
+        setMaxDataPoints(teamData);
+        return teamData;
+    }
+
+    private void setMaxDataPoints(TeamData teamData) {
+        if (teamData.getForm() > TEAM_DATA_MAX.getForm()) {
+            TEAM_DATA_MAX.setForm(teamData.getForm());
+        }
+
+        if (teamData.getCleanSheet() > TEAM_DATA_MAX.getCleanSheet()) {
+            TEAM_DATA_MAX.setCleanSheet(teamData.getCleanSheet());
+        }
+
+        if (teamData.getUnbeatenStreak() > TEAM_DATA_MAX.getUnbeaten()) {
+            TEAM_DATA_MAX.setUnbeaten(teamData.getUnbeatenStreak());
+        }
     }
 
 }
