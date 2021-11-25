@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import service.exception.InternalServiceException;
 import service.exception.InvalidServiceRequestException;
 import service.exception.ServiceException;
+import service.headToHead.HeadToHeadDataCaller;
+import service.headToHead.model.HeadToHeadDataResponse;
 import service.prediction.PredictionServiceCaller;
 import service.prediction.model.request.PredictionRequest;
 import service.prediction.model.response.PredictionResponse;
@@ -25,17 +27,23 @@ import service.teamData.model.TeamNameResponse;
 public class ServiceController {
 
     final TeamDataRepository teamDataRepository;
+    final HeadToHeadDataCaller headToHeadDataCaller;
     final PredictionServiceCaller predictionServiceCaller;
     final TeamDataCaller teamDataCaller;
 
-    public ServiceController(TeamDataRepository teamDataRepository, PredictionServiceCaller predictionServiceCaller, TeamDataCaller teamDataCaller) {
+    public ServiceController(TeamDataRepository teamDataRepository,
+                             HeadToHeadDataCaller headToHeadDataCaller,
+                             PredictionServiceCaller predictionServiceCaller,
+                             TeamDataCaller teamDataCaller) {
         this.teamDataRepository = teamDataRepository;
+        this.headToHeadDataCaller = headToHeadDataCaller;
         this.predictionServiceCaller = predictionServiceCaller;
         this.teamDataCaller = teamDataCaller;
     }
 
     @PostMapping(value = "/predict", produces = "application/json")
-    public ResponseEntity<PredictionResponse> predict(@RequestBody PredictionRequest predictionRequest) throws InvalidServiceRequestException, InternalServiceException {
+    public ResponseEntity<PredictionResponse> predict(@RequestBody PredictionRequest predictionRequest)
+            throws InvalidServiceRequestException, InternalServiceException {
         invalidTeamNameCheck(predictionRequest.getLeagueInfo().getHomeTeam(),
                 predictionRequest.getLeagueInfo().getAwayTeam());
 
@@ -51,7 +59,8 @@ public class ServiceController {
     }
 
     @PostMapping(value = "/teamData/match", produces = "application/json")
-    public ResponseEntity<MatchDayTeamData> getTeamData(@RequestBody PredictionRequest predictionRequest) throws InvalidServiceRequestException {
+    public ResponseEntity<MatchDayTeamData> getTeamData(@RequestBody PredictionRequest predictionRequest)
+            throws InvalidServiceRequestException {
         String homeTeam = predictionRequest.getLeagueInfo().getHomeTeam();
         String awayTeam = predictionRequest.getLeagueInfo().getAwayTeam();
 
@@ -66,6 +75,19 @@ public class ServiceController {
     public ResponseEntity<TeamDataMaximum> getTeamDataMaximum() {
         TeamDataMaximum teamDataMaximum = teamDataCaller.getTeamDataMaximum();
         return ResponseEntity.ok(teamDataMaximum);
+    }
+
+    @PostMapping(value = "/headToHead", produces = "application/json")
+    public ResponseEntity<HeadToHeadDataResponse> getHeadToHeadData(@RequestBody PredictionRequest predictionRequest)
+            throws InvalidServiceRequestException {
+        String homeTeam = predictionRequest.getLeagueInfo().getHomeTeam();
+        String awayTeam = predictionRequest.getLeagueInfo().getAwayTeam();
+
+        invalidTeamNameCheck(homeTeam, awayTeam);
+
+        HeadToHeadDataResponse headToHeadDataResponse = headToHeadDataCaller.getHeadToHeadData(homeTeam, awayTeam);
+
+        return ResponseEntity.ok(headToHeadDataResponse);
     }
 
     @ExceptionHandler({InvalidServiceRequestException.class})

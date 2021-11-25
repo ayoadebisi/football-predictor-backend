@@ -1,8 +1,10 @@
 package cache.config;
 
+import cache.headToHead.HeadToHeadRepository;
+import cache.headToHead.HeadToHeadRepositoryImpl;
 import cache.teamName.TeamDataRepository;
 import cache.teamName.TeamDataRepositoryImpl;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import common.DynamoClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -17,8 +19,13 @@ public class CachingConfig {
     }
 
     @Bean
-    public TeamDataRepository teamDataRepository(DynamoDB dynamoDB) {
-        return new TeamDataRepositoryImpl(dynamoDB, env);
+    public TeamDataRepository teamDataRepository(DynamoClient dynamoClient) {
+        return new TeamDataRepositoryImpl(dynamoClient, env);
+    }
+
+    @Bean
+    public HeadToHeadRepository headToHeadRepository(DynamoClient dynamoClient) {
+        return new HeadToHeadRepositoryImpl(dynamoClient, env);
     }
 
 }

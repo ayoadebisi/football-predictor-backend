@@ -1,13 +1,8 @@
 package cache.teamName;
 
 import cache.model.TeamData;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.ItemCollection;
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import common.DynamoClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static common.Constants.PROD;
 import static common.Constants.STAGE_KEY;
+import static common.DynamoObjectMapper.mapDynamoItem;
 import static common.RandomNumberGenerator.generateRandomInt;
 
 /**
@@ -32,8 +28,6 @@ import static common.RandomNumberGenerator.generateRandomInt;
 @Slf4j
 @Component
 public class TeamDataRepositoryImpl implements TeamDataRepository {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String TABLE_NAME = "Team-Data";
     private static final String TABLE_ATTRIBUTE_NAME = "Team, Form, CleanSheet, UnbeatenStreak, " +
@@ -45,11 +39,11 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
     private static Map<String, TeamData> TEAM_DATA = new HashMap();
     private static TeamDataMaximum TEAM_DATA_MAX = TeamDataMaximum.builder().build();
 
-    private final DynamoDB dynamoDB;
+    private final DynamoClient dynamoClient;
     private final Environment env;
 
-    public TeamDataRepositoryImpl(DynamoDB dynamoDB, Environment env) {
-        this.dynamoDB = dynamoDB;
+    public TeamDataRepositoryImpl(DynamoClient dynamoClient, Environment env) {
+        this.dynamoClient = dynamoClient;
         this.env = env;
     }
 
@@ -62,7 +56,7 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
             String stage = env.getProperty(STAGE_KEY);
 
             if (!PROD.equalsIgnoreCase(stage)) {
-                log.info("Retrieving team name for Devo stage.");
+                log.info("Retrieving team data for non-prod stage.");
                 TEAM_DATA.put("Chelsea", generateMockData("Chelsea"));
                 TEAM_DATA.put("Liverpool", generateMockData("Liverpool"));
                 TEAM_DATA.put("Manchester United", generateMockData("Manchester United"));
@@ -70,19 +64,13 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
                 TEAM_DATA.put("West Ham", generateMockData("West Ham"));
                 TEAM_DATA.put("Arsenal", generateMockData("Arsenal"));
             } else {
-                log.info("Retrieving team name for Prod stage.");
+                log.info("Retrieving team data for Prod stage.");
 
-                Table table = dynamoDB.getTable(TABLE_NAME);
-
-                ScanSpec scanSpec = new ScanSpec().withProjectionExpression(TABLE_ATTRIBUTE_NAME);
-
-                ItemCollection<ScanOutcome> items = table.scan(scanSpec);
-
-                Iterator<Item> iter = items.iterator();
+                Iterator<Item> iter = dynamoClient.getTableItems(TABLE_NAME, TABLE_ATTRIBUTE_NAME);
 
                 while (iter.hasNext()) {
                     Item item = iter.next();
-                    TeamData teamData = convertItemToTeamData(item.asMap());
+                    TeamData teamData = mapDynamoItem(item.asMap(), TeamData.class);
                     setMaxDataPoints(teamData);
                     TEAM_DATA.put(teamData.getTeam(), teamData);
                 }
@@ -113,10 +101,6 @@ public class TeamDataRepositoryImpl implements TeamDataRepository {
     @Override
     public TeamDataMaximum getTeamDataMaximum() {
         return TEAM_DATA_MAX;
-    }
-
-    private TeamData convertItemToTeamData(Map<String, Object> item) {
-        return MAPPER.convertValue(item, TeamData.class);
     }
 
     private TeamData generateMockData(String teamName) {
